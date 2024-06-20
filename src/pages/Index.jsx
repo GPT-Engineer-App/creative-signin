@@ -1,6 +1,8 @@
-import { Container, VStack, Tabs, TabList, TabPanels, Tab, TabPanel, Box, Heading, Input, Button, FormControl, FormLabel, useToast } from "@chakra-ui/react";
 import { useState } from "react";
+import { Container, VStack, Tabs, TabList, TabPanels, Tab, TabPanel, Box, Heading, Input, Button, FormControl, FormLabel, useToast } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 const Index = () => {
   const [signupData, setSignupData] = useState({ username: "", email: "", password: "" });
@@ -17,26 +19,48 @@ const Index = () => {
     setSigninData({ ...signinData, [name]: value });
   };
 
-  const handleSignupSubmit = (e) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    toast({
-      title: "Account created.",
-      description: "We've created your account for you.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+    try {
+      await createUserWithEmailAndPassword(auth, signupData.email, signupData.password);
+      toast({
+        title: "Account created.",
+        description: "We've created your account for you.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Error creating account.",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
-  const handleSigninSubmit = (e) => {
+  const handleSigninSubmit = async (e) => {
     e.preventDefault();
-    toast({
-      title: "Signed in.",
-      description: "You've successfully signed in.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+    try {
+      await signInWithEmailAndPassword(auth, signinData.email, signinData.password);
+      toast({
+        title: "Signed in.",
+        description: "You've successfully signed in.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Error signing in.",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
